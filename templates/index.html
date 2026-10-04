@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AWS FIS · Resilience Lab</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<header>
+    <div class="header-left">
+        <div class="logo">AWS FIS</div>
+
+        <div>
+            <h1>Resilience Lab</h1>
+            <p>Fault Injection & Recovery Dashboard</p>
+        </div>
+    </div>
+
+    <div class="status-pill">
+        ● SYSTEM ONLINE
+    </div>
+</header>
+
+
+<main>
+
+    <section class="hero">
+
+        <div>
+            <p class="eyebrow">AWS FIS · RESILIENCE EXPERIMENT</p>
+
+            <h2>Resilience Dashboard</h2>
+
+            <p>
+                Monitor EC2 fault injection experiments,
+                backend health and recovery results.
+            </p>
+        </div>
+
+    </section>
+
+
+    <!-- STATUS CARDS -->
+
+    <section class="cards">
+
+        <div class="card">
+            <span class="card-label">EC2 INSTANCE</span>
+
+            <h3>FIS-Test-EC2</h3>
+
+            <div class="online">
+                ● RUNNING
+            </div>
+
+            <p>3/3 status checks passed</p>
+        </div>
+
+
+        <div class="card">
+            <span class="card-label">BACKEND</span>
+
+            <h3>Flask API</h3>
+
+            <div class="online">
+                ● ONLINE
+            </div>
+
+            <p>Application server responding</p>
+        </div>
+
+
+        <div class="card">
+            <span class="card-label">DATABASE</span>
+
+            <h3>SQLite</h3>
+
+            <div class="online">
+                ● {{ database_status }}
+            </div>
+
+            <p>Experiment records available</p>
+        </div>
+
+
+        <div class="card">
+            <span class="card-label">LATEST SCENARIO</span>
+
+            <h3>Stop & Restart</h3>
+
+            <div class="scenario">
+                AWS FIS
+            </div>
+
+            <p>EC2 resilience test</p>
+        </div>
+
+    </section>
+
+
+    <!-- EXPERIMENT FORM -->
+
+    <section class="panel">
+
+        <div class="panel-title">
+
+            <div>
+                <p class="eyebrow">EXPERIMENT HISTORY</p>
+                <h2>Record Experiment Result</h2>
+            </div>
+
+        </div>
+
+
+        <form action="/save" method="POST">
+
+            <div class="form-grid">
+
+                <div class="form-group">
+
+                    <label>Experiment Name</label>
+
+                    <input
+                        type="text"
+                        name="experiment_name"
+                        placeholder="EC2-Resilience-Test"
+                        required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Result</label>
+
+                    <select name="result">
+
+                        <option value="SUCCESS">
+                            SUCCESS
+                        </option>
+
+                        <option value="FAILED">
+                            FAILED
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Recovery Notes</label>
+
+                <textarea
+                    name="recovery_notes"
+                    placeholder="Describe how the EC2 instance recovered..."
+                    rows="4"></textarea>
+
+            </div>
+
+
+            <button type="submit">
+                SAVE RESULT
+            </button>
+
+        </form>
+
+    </section>
+
+
+    <!-- HISTORY -->
+
+    <section class="panel">
+
+        <div class="panel-title">
+
+            <div>
+                <p class="eyebrow">DATABASE RECORDS</p>
+                <h2>Experiment History</h2>
+            </div>
+
+            <span class="record-count">
+                {{ experiments|length }} Records
+            </span>
+
+        </div>
+
+
+        {% if experiments %}
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Date</th>
+                        <th>Experiment</th>
+                        <th>Result</th>
+                        <th>Recovery Notes</th>
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for experiment in experiments %}
+
+                    <tr>
+
+                        <td>
+                            {{ experiment["created_at"] }}
+                        </td>
+
+                        <td>
+                            {{ experiment["experiment_name"] }}
+                        </td>
+
+                        <td>
+
+                            {% if experiment["result"] == "SUCCESS" %}
+
+                            <span class="success">
+                                ● SUCCESS
+                            </span>
+
+                            {% else %}
+
+                            <span class="failed">
+                                ● FAILED
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+                            {{ experiment["recovery_notes"] }}
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="empty">
+
+            <p>No experiments recorded yet.</p>
+
+            <span>
+                Run an AWS FIS experiment and record the result above.
+            </span>
+
+        </div>
+
+        {% endif %}
+
+    </section>
+
+</main>
+
+
+<footer>
+
+    <p>
+        AWS FIS Resilience Lab · Student Project
+    </p>
+
+    <p>
+        Flask Backend · SQLite Database · Amazon EC2
+    </p>
+
+</footer>
+
+</body>
+</html>
+
